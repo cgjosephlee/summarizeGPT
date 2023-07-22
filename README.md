@@ -14,6 +14,13 @@ npm run dev
 # Parameters
 Provide url parameters to configure.
 ```
+very long article
+https://summarize-gpt-seven.vercel.app/?api_key=YOUR_KEY&model=gpt-3.5-turbo-16k&chunkSize=10000&chunkOverlap=1000
+
+super long article
+https://summarize-gpt-seven.vercel.app/?api_key=YOUR_KEY&model=gpt-4-32k&chunkSize=25000&chunkOverlap=1000
+
+refine chain
 https://summarize-gpt-seven.vercel.app/?api_key=YOUR_KEY&model=gpt-4&t=0.1&type=refine
 ```
 | params | default |
