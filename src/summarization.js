@@ -14,6 +14,8 @@ async function chatCompletion(
   api_key,
   model,
   temperature,
+  maxRetries = 3,
+  timeout = 6000,
   ) {
   const url = "https://api.openai.com/v1/chat/completions";
   const headers = {
@@ -31,18 +33,24 @@ async function chatCompletion(
     ],
   };
   // console.log(`API call data: ${JSON.stringify(data)}`);
-  const response = fetch(url, {
-    "method": "POST",
-    "headers": headers,
-    "body": JSON.stringify(data),
-  })
-  .then(response => response.json())
-  .then(output => output.choices[0].message.content)
-  .catch(error => {
-    console.error(error);
-    throw new Error("API call failed!");
-  });
-  return response;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        "method": "POST",
+        "headers": headers,
+        "body": JSON.stringify(data),
+        "signal": AbortSignal.timeout(timeout),
+      })
+      .then(response => response.json())
+      .then(output => output.choices[0].message.content)
+      return response
+    } catch (error) {
+      console.error("chatCompletion:", error.name, error.message, `(Attempt ${attempt}/${maxRetries})`);
+      if (attempt === maxRetries) {
+        throw new Error("API call failed!");
+      }
+    }
+  }
 }
 
 // template substitution with parameters in `{__param__}` format
