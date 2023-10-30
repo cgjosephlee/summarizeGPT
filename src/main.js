@@ -25,6 +25,10 @@ document.querySelector("#app").innerHTML = `
     <p/>
     <textarea id="llm-output" rows="10" cols="50" readonly style="display:none;"></textarea>
     <button id="copy" type="button" style="display:none;">Copy</button>
+    <p/>
+    <footer>
+      <p style="color:grey">© 2023 Joseph Lee, <a href="https://github.com/cgjosephlee/summarizeGPT">GitHub</a></p>
+    </footer>
   <div>
 `
 
