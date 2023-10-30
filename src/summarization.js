@@ -95,6 +95,7 @@ export async function summarize(
   type = "map_reduce",  // stuff, refine
   chunkSize = 1000,
   chunkOverlap = 100,
+  elem = document.getElementById("submit"),  // submit button
   ) {
   if (type === "stuff") {
     const output = await chatCompletion(
@@ -110,13 +111,21 @@ export async function summarize(
     if (splits.length === 1) {
       throw new Error("Input is too short to be split");
     }
+    const jobsTotal = splits.length + 1;
+    let jobsDone = 0;
+    const textOrig = elem.innerHTML;
+    elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
     const map_output = await Promise.all(splits.map(async (s) => {
       const output = await chatCompletion(
         substitute(mapPromptTemplate, {"text": s}),
         api_key,
         model,
         temperature,
-      );
+      ).then((output) => {
+        jobsDone += 1;
+        elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
+        return output;
+      });
       return output;
     }));
     console.log(map_output);
@@ -133,12 +142,20 @@ export async function summarize(
     if (splits.length === 1) {
       throw new Error("Input is too short to be split");
     }
+    const jobsTotal = splits.length;
+    let jobsDone = 0;
+    const textOrig = elem.innerHTML;
+    elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
     let output = await chatCompletion(
       substitute(stuffPromptTemplate, {"text": splits[0]}),
       api_key,
       model,
       temperature,
-    );
+    ).then((output) => {
+      jobsDone += 1;
+      elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
+      return output;
+    });
     console.log(output);
     for (let i = 1; i < splits.length; i++) {
       output = await chatCompletion(
@@ -146,7 +163,11 @@ export async function summarize(
         api_key,
         model,
         temperature,
-      );
+      ).then((output) => {
+        jobsDone += 1;
+        elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
+        return output;
+      });
       console.log(output);
     }
     return output
