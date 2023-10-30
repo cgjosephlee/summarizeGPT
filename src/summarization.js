@@ -1,3 +1,4 @@
+import { settings } from "./config.js"
 import { RecursiveTextSplitter } from "./text_splitter.js";
 
 // calculate word counts
@@ -14,8 +15,8 @@ async function chatCompletion(
   api_key,
   model,
   temperature,
-  maxRetries = 3,
-  timeout = 6000,
+  maxRetries = settings.MAX_RETRIES,
+  timeout = settings.TIMEOUT,
   ) {
   const url = "https://api.openai.com/v1/chat/completions";
   const headers = {
@@ -62,30 +63,10 @@ function substitute(template, variables) {
 
 // templates
 // https://github.com/hwchase17/langchainjs/tree/c09f8310a3a2197e98e188167ee39f04dbe18a1d/langchain/src/chains/summarization
-const stuffPromptTemplate = `Write a concise summary of the following:
-
-
-"{__text__}"
-
-
-CONCISE SUMMARY:`;
-
-const mapPromptTemplate = stuffPromptTemplate;
-
-const reducePromptTemplate = stuffPromptTemplate;
-
-const refinePromptTemplate = `Your job is to produce a final summary
-We have provided an existing summary up to a certain point: "{__existing_answer__}"
-We have the opportunity to refine the existing summary
-(only if needed) with some more context below.
-------------
-"{__text__}"
-------------
-
-Given the new context, refine the original summary
-If the context isn't useful, return the original summary.
-
-REFINED SUMMARY:`;
+const stuffPromptTemplate = settings.STUFF_PROMPT_TEMPLATE;
+const mapPromptTemplate = settings.MAP_PROMPT_TEMPLATE;
+const reducePromptTemplate = settings.REDUCE_PROMPT_TEMPLATE;
+const refinePromptTemplate = settings.REFINE_PROMPT_TEMPLATE;
 
 export async function summarize(
   input,

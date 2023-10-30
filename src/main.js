@@ -1,4 +1,5 @@
 import "./style.css"
+import { settings } from "./config.js"
 import { summarize, word_count } from "./summarization.js"
 
 // parameters
@@ -8,11 +9,11 @@ if (API_KEY === null) {
   urlParams.set("api_key", window.prompt("Please enter your OpenAI API key:", ""));
   window.location.search = urlParams.toString();
 }
-const MODEL = urlParams.has("model") ? urlParams.get("model") : "gpt-3.5-turbo";
-const TEMPERATURE = urlParams.has("t") ? parseFloat(urlParams.get("t")) : 0.2;
-const TYPE = urlParams.has("type") ? urlParams.get("type") : "map_reduce";
-const CHUNK_SIZE = urlParams.has("chunkSize") ? parseInt(urlParams.get("chunkSize")) : 1000;
-const CHUNK_OVERLAP = urlParams.has("chunkOverlap") ? parseInt(urlParams.get("chunkOverlap")) : 100;
+const MODEL = urlParams.has("model") ? urlParams.get("model") : settings.MODEL;
+const TEMPERATURE = urlParams.has("t") ? parseFloat(urlParams.get("t")) : settings.TEMPERATURE;
+const TYPE = urlParams.has("type") ? urlParams.get("type") : settings.TYPE;
+const CHUNK_SIZE = urlParams.has("chunkSize") ? parseInt(urlParams.get("chunkSize")) : settings.CHUNK_SIZE;
+const CHUNK_OVERLAP = urlParams.has("chunkOverlap") ? parseInt(urlParams.get("chunkOverlap")) : settings.CHUNK_OVERLAP;
 
 document.querySelector("#app").innerHTML = `
   <div>
