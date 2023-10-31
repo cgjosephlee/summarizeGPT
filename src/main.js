@@ -23,10 +23,11 @@ document.querySelector("#app").innerHTML = `
     <p id="input-count"></p>
     <button id="submit" type="button">Submit</button>
     <button id="clear" type="button">Clear</button>
-    <p id="input-parameter" style="color:grey"></p>
     <p/>
     <textarea id="llm-output" rows="10" cols="50" readonly style="display:none;"></textarea>
     <button id="copy" type="button" style="display:none;">Copy</button>
+    <p/>
+    <p id="input-parameter" style="color:grey"></p>
     <p/>
     <footer>
       <p style="color:grey">© 2023 Joseph Lee, <a href="https://github.com/cgjosephlee/summarizeGPT">GitHub</a></p>
