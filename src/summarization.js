@@ -1,12 +1,25 @@
 import { settings } from "./config.js"
-import { RecursiveTextSplitter } from "./text_splitter.js";
+import { RecursiveTextSplitter } from "./text_splitter.js"
+import { Tiktoken } from "tiktoken/lite"
+import cl100k_base from "tiktoken/encoders/cl100k_base.json"
 
 // calculate word counts
-export function word_count(text) {
+export function countWords(text) {
   let tmp_zh = text.replace(/[^\u4E00-\u9FFF]/g, "");
   let tmp_en = text.replace(/[^a-zA-Z]/g, " ").trim();
   tmp_en = tmp_en === "" ? [] : tmp_en.split(/\s+/);
   return tmp_zh.length + tmp_en.length;
+}
+
+export function countTokens(text) {
+  const enc = new Tiktoken(
+    cl100k_base.bpe_ranks,
+    cl100k_base.special_tokens,
+    cl100k_base.pat_str
+  )
+  const tokens = enc.encode(text)
+  enc.free()
+  return tokens.length
 }
 
 // basic openai api call
