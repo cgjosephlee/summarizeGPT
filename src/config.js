@@ -11,5 +11,5 @@ const settings = {
     REDUCE_PROMPT_TEMPLATE: import.meta.env.VITE_REDUCE_PROMPT_TEMPLATE,
     REFINE_PROMPT_TEMPLATE: import.meta.env.VITE_REFINE_PROMPT_TEMPLATE,
 }
-console.log("settings:", settings)
+console.log("default settings:", settings)
 export { settings }

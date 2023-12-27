@@ -22,7 +22,6 @@ export function countTokens(text) {
   return tokens.length
 }
 
-// basic openai api call
 async function chatCompletion(
   input,
   api_key,
@@ -30,6 +29,40 @@ async function chatCompletion(
   temperature,
   maxRetries = settings.MAX_RETRIES,
   timeout = settings.TIMEOUT,
+  ) {
+    let output;
+    if (model.startsWith("gpt")) {
+      output = chatCompletionOpenAi(
+        input,
+        api_key,
+        model,
+        temperature,
+        maxRetries,
+        timeout,
+      );
+    } else if (model.startsWith("gemini")) {
+      output = chatCompletionGoogle(
+        input,
+        api_key,
+        model,
+        temperature,
+        maxRetries,
+        timeout,
+      );
+    } else {
+      throw new Error("Model is not supported!");
+    }
+    return output;
+  }
+
+// basic openai api call
+async function chatCompletionOpenAi(
+  input,
+  api_key,
+  model,
+  temperature,
+  maxRetries,
+  timeout,
   ) {
   const url = "https://api.openai.com/v1/chat/completions";
   const headers = {
@@ -46,6 +79,64 @@ async function chatCompletion(
       },
     ],
   };
+  const response = await _retry_fetch(
+    url,
+    headers,
+    data,
+    maxRetries,
+    timeout,
+  )
+  .then(output => output.choices[0].message.content)
+  return response
+}
+
+// basic google gemini api call
+async function chatCompletionGoogle(
+  input,
+  api_key,
+  model,
+  temperature,
+  maxRetries,
+  timeout,
+  ) {
+  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${api_key}`;
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  const data = {
+    "contents": [{
+      "parts": [{
+        "text": input,
+      }]
+    }],
+    "generationConfig": {
+      "temperature": temperature,
+      "candidateCount": 1,
+    },
+  };
+  try {
+    const response = await _retry_fetch(
+      url,
+      headers,
+      data,
+      maxRetries,
+      timeout,
+    );
+    const output = response.candidates[0].content.parts[0].text;
+    return output;
+  } catch (error) {
+    console.error("chatCompletionGoogle:", error.name, error.message, response);
+    throw new Error("API call failed!");
+  }
+}
+
+async function _retry_fetch(
+  url,
+  headers,
+  data,
+  maxRetries,
+  timeout,
+) {
   // console.log(`API call data: ${JSON.stringify(data)}`);
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -56,10 +147,9 @@ async function chatCompletion(
         "signal": AbortSignal.timeout(timeout),
       })
       .then(response => response.json())
-      .then(output => output.choices[0].message.content)
       return response
     } catch (error) {
-      console.error("chatCompletion:", error.name, error.message, `(Attempt ${attempt}/${maxRetries})`);
+      console.error("_retry_fetch:", error.name, error.message, `(Attempt ${attempt}/${maxRetries})`);
       if (attempt === maxRetries) {
         throw new Error("API call failed!");
       }
