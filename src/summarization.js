@@ -27,8 +27,8 @@ async function chatCompletion(
   api_key,
   model,
   temperature,
-  maxRetries = settings.MAX_RETRIES,
-  timeout = settings.TIMEOUT,
+  maxRetries,
+  timeout,
   ) {
     let output;
     if (model.startsWith("gpt")) {
@@ -140,6 +140,7 @@ async function _retry_fetch(
   // console.log(`API call data: ${JSON.stringify(data)}`);
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      console.log("_retry_fetch: send request")
       const response = await fetch(url, {
         "method": "POST",
         "headers": headers,
@@ -147,11 +148,14 @@ async function _retry_fetch(
         "signal": AbortSignal.timeout(timeout),
       })
       .then(response => response.json())
+      console.log("_retry_fetch: request finished")
       return response
     } catch (error) {
       console.error("_retry_fetch:", error.name, error.message, `(Attempt ${attempt}/${maxRetries})`);
       if (attempt === maxRetries) {
-        throw new Error("API call failed!");
+        const e = new Error("API call timeout!");
+        e.name = "TimeoutError";
+        throw e;
       }
     }
   }
@@ -179,6 +183,8 @@ export async function summarize(
   type = "map_reduce",  // stuff, refine
   chunkSize = 1000,
   chunkOverlap = 100,
+  maxRetries = 3,
+  timeout = 6000,
   elem = document.getElementById("submit"),  // submit button
   ) {
   if (type === "stuff") {
@@ -187,6 +193,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     );
     return output;
   } else if (type === "map_reduce") {
@@ -205,6 +213,8 @@ export async function summarize(
         api_key,
         model,
         temperature,
+        maxRetries,
+        timeout,
       ).then((output) => {
         jobsDone += 1;
         elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
@@ -218,6 +228,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     );
     return reduce_output;
   } else if (type === "refine") {
@@ -235,6 +247,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     ).then((output) => {
       jobsDone += 1;
       elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
@@ -247,6 +261,8 @@ export async function summarize(
         api_key,
         model,
         temperature,
+        maxRetries,
+        timeout,
       ).then((output) => {
         jobsDone += 1;
         elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
