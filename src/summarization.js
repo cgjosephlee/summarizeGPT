@@ -27,8 +27,8 @@ async function chatCompletion(
   api_key,
   model,
   temperature,
-  maxRetries = settings.MAX_RETRIES,
-  timeout = settings.TIMEOUT,
+  maxRetries,
+  timeout,
   ) {
     let output;
     if (model.startsWith("gpt")) {
@@ -179,6 +179,8 @@ export async function summarize(
   type = "map_reduce",  // stuff, refine
   chunkSize = 1000,
   chunkOverlap = 100,
+  maxRetries = 3,
+  timeout = 6000,
   elem = document.getElementById("submit"),  // submit button
   ) {
   if (type === "stuff") {
@@ -187,6 +189,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     );
     return output;
   } else if (type === "map_reduce") {
@@ -205,6 +209,8 @@ export async function summarize(
         api_key,
         model,
         temperature,
+        maxRetries,
+        timeout,
       ).then((output) => {
         jobsDone += 1;
         elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
@@ -218,6 +224,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     );
     return reduce_output;
   } else if (type === "refine") {
@@ -235,6 +243,8 @@ export async function summarize(
       api_key,
       model,
       temperature,
+      maxRetries,
+      timeout,
     ).then((output) => {
       jobsDone += 1;
       elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;
@@ -247,6 +257,8 @@ export async function summarize(
         api_key,
         model,
         temperature,
+        maxRetries,
+        timeout,
       ).then((output) => {
         jobsDone += 1;
         elem.innerHTML = `${textOrig} (${jobsDone}/${jobsTotal})`;

@@ -14,6 +14,7 @@ const TEMPERATURE = urlParams.has("t") ? parseFloat(urlParams.get("t")) : settin
 const TYPE = urlParams.has("type") ? urlParams.get("type") : settings.TYPE;
 const CHUNK_SIZE = urlParams.has("chunkSize") ? parseInt(urlParams.get("chunkSize")) : settings.CHUNK_SIZE;
 const CHUNK_OVERLAP = urlParams.has("chunkOverlap") ? parseInt(urlParams.get("chunkOverlap")) : settings.CHUNK_OVERLAP;
+const TIMEOUT = urlParams.has("timeout") ? parseInt(urlParams.get("timeout")) : settings.TIMEOUT;
 
 document.querySelector("#app").innerHTML = `
   <div>
@@ -45,7 +46,7 @@ const btnCopy = document.getElementById("copy");
 
 taUserInput.innerHTML = "Enter text here"
 pInputCount.innerHTML = "Characters: 0<br>Words: 0<br>Tokens: 0"
-pInputParameter.innerHTML = `<i>Model: ${MODEL}<br>Temperature: ${TEMPERATURE}<br>Type: ${TYPE}<br>Chunk size: ${CHUNK_SIZE}<br>Chunk overlap: ${CHUNK_OVERLAP}</i>`
+pInputParameter.innerHTML = `<i>Model: ${MODEL}<br>Temperature: ${TEMPERATURE}<br>Type: ${TYPE}<br>Chunk size: ${CHUNK_SIZE}<br>Chunk overlap: ${CHUNK_OVERLAP}<br>Timeout: ${TIMEOUT} ms</i>`
 
 taUserInput.addEventListener("blur", () => {
   const l = taUserInput.value.length
@@ -66,6 +67,8 @@ btnSubmit.addEventListener("click", () => {
     TYPE,
     CHUNK_SIZE,
     CHUNK_OVERLAP,
+    3,
+    TIMEOUT,
   ).then(output => {
     btnSubmit.disabled = false
     btnSubmit.innerHTML = "Submit"
